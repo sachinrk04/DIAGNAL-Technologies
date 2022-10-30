@@ -7,13 +7,14 @@ import Loading from "./components/Loading";
 const ListingPage = React.lazy(() => import("./pages/ListingPage"));
 
 function App(props) {
-  useEffect(() => {
-    props.onFetchContents();
-  }, []);
-
   const contents = Object.keys(props.content).length
     ? props.content["content-items"]
     : [];
+
+  useEffect(() => {
+    props.onFetchContents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
