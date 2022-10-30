@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, Suspense } from "react";
+import { connect } from "react-redux";
+import Header from "./components/Header";
+import * as actions from "./actions/index";
+import Loading from "./components/Loading";
 
-function App() {
+const ListingPage = React.lazy(() => import("./pages/ListingPage"));
+
+function App(props) {
+  useEffect(() => {
+    props.onFetchContents();
+  }, []);
+
+  const contents = Object.keys(props.content).length
+    ? props.content["content-items"]
+    : [];
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header />
+      <div className="mt-14">
+        {contents.length ? (
+          <Suspense fallback={<Loading />}>
+            <ListingPage datas={contents} />
+          </Suspense>
+        ) : (
+          <Loading />
+        )}
+      </div>
+    </>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    content: state.content.content,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onFetchContents: () => dispatch(actions.getContent()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
